@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run --rm -it -v $CONDA_PREFIX:/home/nvim-user/.conda/envs/mounted -v $(pwd):/home/nvim-user/mount liamgreenlee/neovim-ide:latest

@@ -1,2 +1,29 @@
 #!/bin/bash
-docker run --rm -it -v $CONDA_PREFIX:/home/nvim-user/.conda/envs/mounted -v $(pwd):/home/nvim-user/mount liamgreenlee/neovim-ide:latest
+fflag=false
+
+options="f:"
+while getopts "f:" flag; do
+	case $flag in 
+		f) 
+            fflag=true
+            environment=$OPTARG
+			;;
+	esac
+done
+
+if [ $fflag = true ]; then
+    if [ -f $environment ]; then
+        echo "$environment exists"
+	    docker run -it -v $(readlink -e $environment):/home/nvim-user/.config/container-files/environment.yml -v $(pwd):/home/nvim-user/mount --name neovim-environment liamgreenlee/neovim-ide:latest -f $environment
+    else
+        echo "$environment does not exist"
+    fi
+else
+    if [ ! -z $CONDA_PREFIX ]; then
+        echo "no environment file used"
+	    docker run --rm -it -v $CONDA_PREFIX:/home/nvim-user/.conda/envs/mounted -v $(pwd):/home/nvim-user/mount liamgreenlee/neovim-ide:latest
+    else
+	    docker run --rm -it -v $(pwd):/home/nvim-user/mount liamgreenlee/neovim-ide:latest -n
+    fi
+fi
+

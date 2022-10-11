@@ -16,13 +16,11 @@ RUN npm i -g pyright tree-sitter-cli
 
 USER nvim-user
 WORKDIR /home/nvim-user
-RUN mkdir -p .config/nvim
+RUN mkdir -p .config/nvim && mkdir -p .config/container-files
 RUN /opt/conda/bin/conda init bash
 
-#COPY --chown=nvim-user:nvim-group init.vim /home/nvim-user/.config/nvim/init.vim
 COPY --chown=nvim-user:nvim-group ./ /home/nvim-user/.config/nvim/
-# RUN nvim --headless +PackerSync +qa
 RUN nvim --headless -c 'autocmd User PackerComplete quitall'
 # Test bind mount
-
-ENTRYPOINT ["/opt/conda/bin/conda", "run", "--no-capture-output", "-n", "mounted", "nvim"]
+COPY --chown=nvim-user:nvim-group entrypoint.sh /home/nvim-user/.config/container-files/entrypoint.sh
+ENTRYPOINT [ "/home/nvim-user/.config/container-files/entrypoint.sh" ]

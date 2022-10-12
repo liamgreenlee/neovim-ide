@@ -1,9 +1,53 @@
 local keymaps = {}
 
-function keymaps.load_colorscheme()
-  require('gruvbox')
+function keymaps.load_mason()
+  require("mason").setup()
+end
+
+function keymaps.load_gitsigns()
+  require('gitsigns').setup {
+    signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
+    numhl      = true, -- Toggle with `:Gitsigns toggle_numhl`
+    word_diff  = true, -- Toggle with `:Gitsigns toggle_word_diff`
+    current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+    current_line_blame_opts = {
+      delay = 100,
+    },
+  }
+end
+
+function keymaps.load_ui()
+  vim.o.number = true
   vim.o.background = "dark" -- or "light" for light mode
-  vim.cmd([[colorscheme gruvbox]])
+  local c = require('vscode.colors')
+  require('vscode').setup({
+    -- Enable transparent background
+
+    -- Enable italic comment
+    italic_comments = true,
+
+    -- Disable nvim-tree background color
+    disable_nvimtree_bg = true,
+
+    -- Override colors (see ./lua/vscode/colors.lua)
+ --   color_overrides = {
+ --       vscLineNumber = '#FFFFFF',
+ --   },
+
+    -- Override highlight groups (see ./lua/vscode/theme.lua)
+    group_overrides = {
+        -- this supports the same val table as vim.api.nvim_set_hl
+        -- use colors from this colorscheme by requiring vscode.colors!
+        Cursor = { fg=c.vscDarkBlue, bg=c.vscLightGreen, bold=true },
+    }
+  })
+
+  vim.opt.list = true
+  vim.opt.listchars:append "space:⋅"
+  require('indent_blankline').setup{
+    space_char_blankline = " "
+  }
+
 end
 
 function keymaps.load_telescope()

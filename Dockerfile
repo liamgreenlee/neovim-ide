@@ -2,7 +2,7 @@ FROM ubuntu:latest
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
     apt-get install --assume-yes \
-    git wget python3 pip curl apt-utils \
+    git wget python3 pip curl apt-utils unzip\
  && rm -rf /var/lib/apt/lists/*
 ENV CONDA_DIR /opt/conda
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \

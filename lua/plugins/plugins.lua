@@ -43,9 +43,9 @@ function load_plugins()
   }
 
   use {
- 		'romgrk/barbar.nvim',
-  	requires = {'kyazdani42/nvim-web-devicons'}
-	}
+    'romgrk/barbar.nvim',
+    requires = {'kyazdani42/nvim-web-devicons'}
+  }
   
   use { "ellisonleao/gruvbox.nvim" }
 
@@ -55,6 +55,17 @@ function load_plugins()
 	  open_mapping = [[<c-\>]],
 	}
   end}
+
+  use {'lewis6991/gitsigns.nvim'}
+
+  use {'Mofiqul/vscode.nvim'}
+
+  -- using packer.nvim
+  use {'akinsho/bufferline.nvim', tag = "v2.*", requires = 'kyazdani42/nvim-web-devicons'}
+
+  use {"lukas-reineke/indent-blankline.nvim"}
+
+  use { "williamboman/mason.nvim" }
 
   end,
   config = {
@@ -71,7 +82,9 @@ function load_config()
   keymaps.load_telescope()
   keymaps.load_nvimtree()
   keymaps.load_barbar()
-  keymaps.load_colorscheme()
+  keymaps.load_ui()
+  keymaps.load_gitsigns()
+  keymaps.load_mason()
 end
 
 local ensure_packer = function()

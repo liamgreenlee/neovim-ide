@@ -2,30 +2,16 @@
 # update the uid
 opt_u=nvim-user
 opt_g=nvim-group
-if [ -n "$opt_u" ]; then
-  OLD_UID=$(getent passwd "${opt_u}" | cut -f3 -d:)
-  NEW_UID=$(stat -c "%u" "/home/nvim-user/mount")
-  if [ "$OLD_UID" != "$NEW_UID" ]; then
-    #echo "Changing UID of $opt_u from $OLD_UID to $NEW_UID"
-    usermod -u "$NEW_UID" -o "$opt_u"
-    if [ -n "$opt_r" ]; then
-      find / -xdev -user "$OLD_UID" -exec chown -h "$opt_u" {} \;
-    fi
-  fi
-fi
+OLD_UID=$(getent passwd "${opt_u}" | cut -f3 -d:)
+NEW_UID=$(stat -c "%u" "/home/nvim-user/mount")
 
 # update the gid
-if [ -n "$opt_g" ]; then
-  OLD_GID=$(getent group "${opt_g}" | cut -f3 -d:)
-  NEW_GID=$(stat -c "%g" "/home/nvim-user/mount")
-  if [ "$OLD_GID" != "$NEW_GID" ]; then
-    #echo "Changing GID of $opt_g from $OLD_GID to $NEW_GID"
-    groupmod -g "$NEW_GID" -o "$opt_g"
-    if [ -n "$opt_r" ]; then
-      find / -xdev -group "$OLD_GID" -exec chgrp -h "$opt_g" {} \;
-    fi
-  fi
-fi
+OLD_GID=$(getent group "${opt_g}" | cut -f3 -d:)
+NEW_GID=$(stat -c "%g" "/home/nvim-user/mount")
+
+sed -i -e "s/^\\($opt_u:[^:]\\):[0-9]*:[0-9]*:/\\1:$NEW_UID:$NEW_GID:/" /etc/passwd
+find / -xdev -user "$OLD_UID" -exec chown -h "$opt_u" {} \;
+find / -xdev -group "$OLD_GID" -exec chgrp -h "$opt_g" {} \;
 
 fflag=false
 nflag=false
@@ -47,7 +33,8 @@ elif [ ! $nflag = true ]; then
     cmd="/opt/conda/bin/conda run --no-capture-output -n mounted nvim mount"
 else
 	#echo "no environment"
-	cmd=nvim mount
+	cmd="nvim mount"
 fi
+
 exec gosu nvim-user bash -l -c "$cmd"
 

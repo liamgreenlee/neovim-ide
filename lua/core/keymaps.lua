@@ -1,14 +1,9 @@
 local keymaps = {}
 
-function keymaps.load_mason()
-  require("mason").setup()
-end
-
 function keymaps.load_gitsigns()
   require('gitsigns').setup {
     signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
     numhl      = true, -- Toggle with `:Gitsigns toggle_numhl`
-    word_diff  = true, -- Toggle with `:Gitsigns toggle_word_diff`
     current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
     current_line_blame_opts = {
       delay = 100,

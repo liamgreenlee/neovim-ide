@@ -1,5 +1,22 @@
 local config = {}
 
+local servers = {
+  "sumneko_lua",
+  "pyright",
+}
+
+local mason_settings = {
+  ui = {
+    border = "rounded",
+    icons = {
+      package_installed = "◍",
+      package_pending = "◍",
+      package_uninstalled = "◍",
+    },
+  },
+  log_level = vim.log.levels.INFO,
+  max_concurrent_installers = 4,
+}
 function config.nvim_cmp()
   local cmp = require('cmp')
   cmp.setup({
@@ -35,40 +52,33 @@ function config.nvim_cmp()
 end
 
 function config.load_cmp()
-  local on_attach = function(_, bufnr)
-    local function buf_set_option(...)
-      vim.api.nvim_buf_set_option(bufnr, ...)
+  require("mason").setup(mason_settings)
+  require("mason-lspconfig").setup({
+    ensure_installed = servers
+  })
+
+
+  local lspconfig = require('lspconfig')
+  local opts = {}
+  for _, server in pairs(servers) do
+    opts = {
+      on_attach = require("lsp.handlers").on_attach,
+      capabilities = require("lsp.handlers").capabilities,
+    }
+
+    if server == "sumneko_lua" then
+      opts = vim.tbl_deep_extend("force", {
+      settings = {
+      Lua = {
+      diagnostics = {
+	globals = {'vim'}
+      }}}}, opts)
     end
 
-    buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-    -- Mappings.
-    local opts = { buffer = bufnr, noremap = true, silent = true }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
-    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
-    vim.keymap.set('n', '<space>wl', function()
-      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, opts)
-    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-    vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+    server = vim.split(server, "@")[1]
+    lspconfig[server].setup(opts)
+    ::continue::
   end
-
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-  require('lspconfig')['pyright'].setup {
-    capabilities = capabilities,
-    on_attach = on_attach
-  }
 end
 
 return config

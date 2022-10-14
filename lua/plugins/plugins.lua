@@ -9,8 +9,6 @@ function load_plugins()
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
-  use 'neovim/nvim-lspconfig' -- Configurations for Nvim LSP
-
   use {
     'hrsh7th/nvim-cmp',
     requires = {
@@ -65,7 +63,14 @@ function load_plugins()
 
   use {"lukas-reineke/indent-blankline.nvim"}
 
-  use { "williamboman/mason.nvim" }
+  use {
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    "neovim/nvim-lspconfig"
+  }
+
+  use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
+
 
   end,
   config = {
@@ -77,14 +82,13 @@ function load_plugins()
 end
 
 function load_config()
-  lsp_config.load_cmp()
   local keymaps = require('core.keymaps')
   keymaps.load_telescope()
   keymaps.load_nvimtree()
   keymaps.load_barbar()
   keymaps.load_ui()
   keymaps.load_gitsigns()
-  keymaps.load_mason()
+  lsp_config.load_cmp()
 end
 
 local ensure_packer = function()

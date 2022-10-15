@@ -15,7 +15,7 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt install nodejs
 RUN ln -sf python3 /usr/bin/python
 RUN wget https://github.com/neovim/neovim/releases/download/v0.8.0/nvim-linux64.deb && apt install ./nvim-linux64.deb -y && rm nvim-linux64.deb
-RUN groupadd -r nvim-group && useradd -m nvim-user -g nvim-group
+RUN groupadd -g 1000 -r nvim-group && useradd -u 1000 -m nvim-user -g nvim-group
 RUN npm i -g tree-sitter-cli
 
 USER nvim-user

@@ -1,17 +1,27 @@
 #!/bin/bash
-# update the uid
 opt_u=nvim-user
 opt_g=nvim-group
+
 OLD_UID=$(getent passwd "${opt_u}" | cut -f3 -d:)
 NEW_UID=$(stat -c "%u" "/home/nvim-user/mount")
+OLD_GID=$(getent group "${opt_g}" | cut -f3 -d:)
 
-# update the gid
+if [ "$OLD_UID" != "$NEW_UID" ]; then
+  echo "Changing UID of $opt_u from $OLD_UID to $NEW_UID"
+  sed -i -e "s/^\\($opt_u:[^:]\\):[0-9]*:[0-9]*:/\\1:$NEW_UID:$OLD_GID:/" /etc/passwd
+  find / -xdev -user "$OLD_UID" -exec chown -h "$opt_u" {} \;
+fi
+
+OLD_UID=$(getent passwd "${opt_u}" | cut -f3 -d:)
 OLD_GID=$(getent group "${opt_g}" | cut -f3 -d:)
 NEW_GID=$(stat -c "%g" "/home/nvim-user/mount")
 
-sed -i -e "s/^\\($opt_u:[^:]\\):[0-9]*:[0-9]*:/\\1:$NEW_UID:$NEW_GID:/" /etc/passwd
-find / -xdev -user "$OLD_UID" -exec chown -h "$opt_u" {} \;
-find / -xdev -group "$OLD_GID" -exec chgrp -h "$opt_g" {} \;
+if [ "$OLD_GID" != "$NEW_GID" ]; then
+  echo "Changing GID of $opt_g from $OLD_GID to $NEW_GID"
+  sed -i -e "s/^\\($opt_u:[^:]\\):[0-9]*:[0-9]*:/\\1:$OLD_UID:$NEW_UID:/" /etc/passwd
+  find / -xdev -group "$OLD_GID" -exec chgrp -h "$opt_g" {} \;
+  
+fi
 
 fflag=false
 nflag=false

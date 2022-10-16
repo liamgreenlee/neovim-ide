@@ -2,7 +2,7 @@ FROM ubuntu:latest
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
     apt-get install --assume-yes \
-    wget python3 pip curl apt-utils unzip gosu software-properties-common \
+    wget python3 pip curl apt-utils unzip gosu software-properties-common ripgrep\
  && rm -rf /var/lib/apt/lists/*
 RUN add-apt-repository ppa:git-core/ppa
 RUN apt update -y

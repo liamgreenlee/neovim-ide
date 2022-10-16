@@ -52,6 +52,8 @@ function keymaps.load_telescope()
     vim.keymap.set('n', 'fb', builtin.buffers, {})
     vim.keymap.set('n', 'fh', builtin.help_tags, {})
 end
+-- this is passed in the call to setup
+
 
 function keymaps.load_nvimtree()
     -- examples for your init.lua
@@ -62,23 +64,34 @@ function keymaps.load_nvimtree()
 
     -- OR setup with some options
     require("nvim-tree").setup({
-    sort_by = "case_sensitive",
-    open_on_setup = true,
-    open_on_tab = true,
-    view = {
-        adaptive_size = true,
-        mappings = {
-        list = {
-          { key = "u", action = "dir_up" },
+        open_on_setup = true,
+        open_on_tab = true,
+        view = {
+            adaptive_size = true
         },
+        renderer = {
+            group_empty = true,
         },
-    },
-    renderer = {
-        group_empty = true,
-    },
-    filters = {
-        dotfiles = true,
-    },
+        filters = {
+            dotfiles = false,
+        },
+        hijack_cursor = false,
+
+        on_attach = function(bufnr)
+          local bufmap = function(lhs, rhs, desc)
+            vim.keymap.set('n', lhs, rhs, {buffer = bufnr, desc = desc})
+          end
+
+          -- See :help nvim-tree.api
+          local api = require('nvim-tree.api')
+                  local telescope = require('telescope.builtin')
+
+          bufmap('L', api.node.open.edit, 'Expand folder or go to file')
+          bufmap('H', api.node.navigate.parent_close, 'Close parent folder')
+          bufmap('gh', api.tree.toggle_hidden_filter, 'Toggle hidden files')
+          bufmap('<C-f>', telescope.find_files, 'Find files')
+          bufmap('<C-g>', telescope.live_grep, 'Live grep')
+        end
     })
 end
 
@@ -122,25 +135,25 @@ function keymaps.load_barbar()
     map('n', '<Space>bd', '<Cmd>BufferOrderByDirectory<CR>', opts)
     map('n', '<Space>bl', '<Cmd>BufferOrderByLanguage<CR>', opts)
     map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', opts)
-    
+
     -- Other:
     -- :BarbarEnable - enables barbar (enabled by default)
     -- :BarbarDisable - very bad command, should never be used
     local nvim_tree_events = require('nvim-tree.events')
     local bufferline_api = require('bufferline.api')
-    
+
     local function get_tree_size()
       return require'nvim-tree.view'.View.width
     end
-    
+
     nvim_tree_events.subscribe('TreeOpen', function()
       bufferline_api.set_offset(get_tree_size())
     end)
-    
+
     nvim_tree_events.subscribe('Resize', function()
       bufferline_api.set_offset(get_tree_size())
     end)
-    
+
     nvim_tree_events.subscribe('TreeClose', function()
       bufferline_api.set_offset(0)
     end)
